@@ -15,9 +15,9 @@ import {
 
 import "../../src/App.css";
 
-const API_BASE_URL = "http://127.0.0.1:9001/api";
+import { API_BASE_URL } from "../../src/constants";
 
-// Change these two endpoints only if your backend route names are different.
+
 const AIRCRAFT_LIST_API = `${API_BASE_URL}/aircraft/aircraft/`;
 const AIRCRAFT_DELETE_API = `${API_BASE_URL}/aircraft/delete-aircraft/`;
 const AIRCRAFT_BULK_DELETE_API = `${API_BASE_URL}/aircraft/bulk-delete-aircraft/`;
@@ -25,23 +25,17 @@ const AIRCRAFT_BULK_APPROVE_API =`${API_BASE_URL}/aircraft/bulk-approve-aircraft
 const AIRCRAFT_BULK_DISAPPROVE_API =`${API_BASE_URL}/aircraft/bulk-disapprove-aircraft/`;
 
 const AircraftManagement = () => {
-  // ==============================
-  // MANUFACTURER STATES
-  // ==============================
+
   const [manufacturers, setManufacturers] = useState([]);
   const [manufacturerSearch, setManufacturerSearch] = useState("");
   const [selectedManufacturer, setSelectedManufacturer] = useState(null);
   const [showManufacturerDropdown, setShowManufacturerDropdown] =
     useState(false);
 
-  // ==============================
-  // FILE STATES
-  // ==============================
+
   const [files, setFiles] = useState([]);
 
-  // ==============================
-  // LOADING / MESSAGE STATES
-  // ==============================
+
   const [loadingManufacturers, setLoadingManufacturers] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loadingAircraft, setLoadingAircraft] = useState(false);
@@ -56,9 +50,7 @@ const AircraftManagement = () => {
   const [selectedAircraft, setSelectedAircraft] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // ==============================
-  // PAGINATION
-  // ==============================
+
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 15;
 
@@ -476,160 +468,6 @@ const handleBulkDisapprove = async () => {
     }
   };
 
-  // ============================================================
-  // UPLOAD AIRCRAFT JSON FILES
-  // ============================================================
-
-// const handleUpload = async () => {
-//   setMessage("");
-//   setError("");
-
-//   // Manufacturer validation
-//   if (!selectedManufacturer?.id) {
-//     setError("Please select a manufacturer.");
-//     return;
-//   }
-
-//   // File validation
-//   if (files.length === 0) {
-//     setError("Please select at least one JSON file.");
-//     return;
-//   }
-
-//   try {
-//     setUploading(true);
-
-//     const formData = new FormData();
-
-//     // Manufacturer ID
-//     formData.append(
-//       "manufacturer_id",
-//       selectedManufacturer.id
-//     );
-
-//     // Multiple JSON files
-//     files.forEach((file) => {
-//       formData.append("files", file);
-//     });
-
-//     const response = await fetch(
-//       `${API_BASE_URL}/aircraft/upload-json`,
-//       {
-//         method: "POST",
-//         body: formData,
-//         credentials: "include",
-//       }
-//     );
-
-//     const data = await response.json();
-
-//     if (!response.ok) {
-//       throw new Error(
-//         data?.detail ||
-//           data?.message ||
-//           "Failed to upload aircraft JSON files."
-//       );
-//     }
-
-//     // Use backend response message if available
-//     if (data?.message) {
-//       setMessage(data.message);
-//     } else if (
-//       data?.uploaded_count !== undefined
-//     ) {
-//       setMessage(
-//         `${data.uploaded_count} aircraft JSON file(s) uploaded successfully.`
-//       );
-//     } else if (
-//       data?.created_count !== undefined
-//     ) {
-//       setMessage(
-//         `${data.created_count} aircraft created successfully.`
-//       );
-//     } else {
-//       setMessage(
-//         "Aircraft JSON file(s) uploaded successfully."
-//       );
-//     }
-
-//     // Get only successfully uploaded aircraft IDs
-//     const uploadedAircraftIds = Array.isArray(data?.results)
-//       ? data.results
-//           .filter(
-//             (result) =>
-//               result.status === "success" &&
-//               result.aircraft_id
-//           )
-//           .map((result) => String(result.aircraft_id))
-//       : [];
-
-//     // Fetch aircraft data only to get complete details,
-//     // then show only the aircraft uploaded in this request
-//     if (uploadedAircraftIds.length > 0) {
-//       const allResponse = await fetch(
-//         AIRCRAFT_LIST_API,
-//         {
-//           method: "GET",
-//           credentials: "include",
-//         }
-//       );
-
-//       const allData = await allResponse.json();
-
-//       if (!allResponse.ok) {
-//         throw new Error(
-//           allData?.detail ||
-//             "Failed to fetch uploaded aircraft."
-//         );
-//       }
-
-//       const allAircraftData = Array.isArray(allData)
-//         ? allData
-//         : allData?.data ||
-//           allData?.aircrafts ||
-//           [];
-
-//       const uploadedAircrafts = allAircraftData.filter(
-//         (aircraft) =>
-//           uploadedAircraftIds.includes(
-//             String(aircraft.id)
-//           )
-//       );
-
-//       setAircrafts(uploadedAircrafts);
-//       setCurrentPage(1);
-//       setSelectedAircraftIds([]);
-//     } else {
-//       setAircrafts([]);
-//       setCurrentPage(1);
-//       setSelectedAircraftIds([]);
-//     }
-
-//     // Clear selected files
-//     setFiles([]);
-
-//     const fileInput = document.getElementById(
-//       "aircraftJsonFiles"
-//     );
-
-//     if (fileInput) {
-//       fileInput.value = "";
-//     }
-//   } catch (err) {
-//     console.error(
-//       "Aircraft Upload Error:",
-//       err
-//     );
-
-//     setError(
-//       err.message ||
-//         "Failed to upload aircraft JSON files."
-//     );
-//   } finally {
-//     setUploading(false);
-//   }
-// };
-
   const handleUpload = async () => {
     setMessage("");
     setError("");
@@ -695,7 +533,6 @@ const handleBulkDisapprove = async () => {
         fileInput.value = "";
       }
 
-      // Start checking background upload status
       if (data?.task_id) {
         const taskId = data.task_id;
 
@@ -770,17 +607,11 @@ const handleBulkDisapprove = async () => {
   };
 
 
-  // ============================================================
-  // DELETE AIRCRAFT CLICK
-  // ============================================================
   const handleDeleteClick = (aircraft) => {
     setSelectedAircraft(aircraft);
     setShowDeleteModal(true);
   };
 
-  // ============================================================
-  // DELETE AIRCRAFT
-  // ============================================================
   const handleDelete = async () => {
     if (!selectedAircraft?.id) {
       return;
@@ -837,9 +668,6 @@ const handleBulkDisapprove = async () => {
     }
   };
 
-  // ============================================================
-  // PAGINATION
-  // ============================================================
   const totalPages = Math.ceil(
     aircrafts.length / recordsPerPage
   );
@@ -1403,11 +1231,6 @@ const handleBulkDisapprove = async () => {
             <h3>
               No aircraft found
             </h3>
-
-            {/* <p>
-              Upload aircraft JSON files to add
-              aircraft.
-            </p> */}
 
           </div>
 

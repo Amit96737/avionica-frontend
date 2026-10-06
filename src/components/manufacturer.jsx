@@ -20,7 +20,7 @@ import {
 
 import "../../src/App.css";
 
-const API_BASE_URL = "http://127.0.0.1:9001/api";
+import { API_BASE_URL } from "../../src/constants";
 
 const ManufacturerManagement = () => {
   const [file, setFile] = useState(null);
@@ -100,8 +100,8 @@ const ManufacturerManagement = () => {
 
       setSelectedIds([]);
     } catch (error) {
-      console.error("Error fetching manufacturers:", error);
-      setError("Failed to fetch manufacturers.");
+      // console.error("Error fetching manufacturers:", error);
+      // setError("Failed to fetch manufacturers.");
     } finally {
       setListLoading(false);
     }
@@ -747,15 +747,6 @@ const ManufacturerManagement = () => {
       <div className="manufacturer-header-banner">
         <h1>Manufacturer Management</h1>
 
-        {/* 
-        <label
-          htmlFor="manufacturerFile"
-          className="add-manufacturer-btn"
-        >
-          <Plus size={16} />
-          Add Manufacturer
-        </label>
-        */}
       </div>
 
       {/* MESSAGES */}
@@ -866,14 +857,6 @@ const ManufacturerManagement = () => {
         {/* BULK ACTIONS */}
         <div className="bulk-actions">
 
-          {/* <button
-            type="button"
-            className="bulk-approve-button"
-            onClick={fetchAllManufacturers}
-          >
-            View All Manufacturer
-          </button> */}
-
           <button
             type="button"
             className="bulk-approve-button"
@@ -905,7 +888,6 @@ const ManufacturerManagement = () => {
                   size={16}
                   className="loading-icon"
                 />
-                {/* Approving... */}
               </>
             ) : (
               <>
@@ -927,23 +909,6 @@ const ManufacturerManagement = () => {
 
         </div>
 
-        {/* SEARCH */}
-
-        {/* 
-        <div className="search-box">
-          <Search size={16} />
-
-          <input
-            type="text"
-            placeholder="Search manufacturer..."
-            value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
-          />
-        </div>
-        */}
-
         {listLoading ? (
           <div className="empty-state">
 
@@ -961,11 +926,6 @@ const ManufacturerManagement = () => {
             <Building2 size={35} />
 
             <h3>No manufacturers found</h3>
-
-            {/* <p>
-              Try changing your search or upload manufacturer
-              data.
-            </p> */}
 
           </div>
         ) : (
@@ -1490,220 +1450,6 @@ const ManufacturerManagement = () => {
 
       )}
 
-      {/* EDIT MODAL */}
-
-      {/*
-      {showEditModal && editData && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowEditModal(false)}
-        >
-
-          <div
-            className="edit-modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-          >
-
-            <div className="modal-header">
-
-              <div>
-
-                <h2>
-                  Update Manufacturer
-                </h2>
-
-                <p>
-                  Update manufacturer information.
-                </p>
-
-              </div>
-
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() =>
-                  setShowEditModal(false)
-                }
-              >
-                <X size={20} />
-              </button>
-
-            </div>
-
-            <div className="edit-form">
-
-              <div className="form-group">
-
-                <label>
-                  Company Name
-                </label>
-
-                <input
-                  name="company_name"
-                  value={
-                    editData.company_name || ""
-                  }
-                  onChange={handleEditChange}
-                />
-
-              </div>
-
-              <div className="form-row">
-
-                <div className="form-group">
-
-                  <label>
-                    Headquarter
-                  </label>
-
-                  <input
-                    name="headquarter"
-                    value={
-                      editData.headquarter || ""
-                    }
-                    onChange={handleEditChange}
-                  />
-
-                </div>
-
-                <div className="form-group">
-
-                  <label>
-                    Founding Date
-                  </label>
-
-                  <input
-                    name="founding_date"
-                    value={
-                      editData.founding_date || ""
-                    }
-                    onChange={handleEditChange}
-                  />
-
-                </div>
-
-              </div>
-
-              <div className="form-row">
-
-                <div className="form-group">
-
-                  <label>
-                    Licence Type
-                  </label>
-
-                  <input
-                    name="licence_type"
-                    value={
-                      editData.licence_type || ""
-                    }
-                    onChange={handleEditChange}
-                  />
-
-                </div>
-
-                <div className="form-group">
-
-                  <label>
-                    Author Name
-                  </label>
-
-                  <input
-                    name="author_name"
-                    value={
-                      editData.author_name || ""
-                    }
-                    onChange={handleEditChange}
-                  />
-
-                </div>
-
-              </div>
-
-              <div className="form-group">
-
-                <label>
-                  Wiki Link
-                </label>
-
-                <input
-                  name="wiki_link"
-                  value={
-                    editData.wiki_link || ""
-                  }
-                  onChange={handleEditChange}
-                />
-
-              </div>
-
-              <div className="form-group">
-
-                <label>
-                  Company Description
-                </label>
-
-                <textarea
-                  name="company_description"
-                  rows="4"
-                  value={
-                    editData.company_description ||
-                    ""
-                  }
-                  onChange={handleEditChange}
-                />
-
-              </div>
-
-              <div className="form-group">
-
-                <label>
-                  Company History
-                </label>
-
-                <textarea
-                  name="company_history"
-                  rows="4"
-                  value={
-                    editData.company_history || ""
-                  }
-                  onChange={handleEditChange}
-                />
-
-              </div>
-
-            </div>
-
-            <div className="modal-footer">
-
-              <button
-                type="button"
-                className="cancel-button"
-                onClick={() =>
-                  setShowEditModal(false)
-                }
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="save-button"
-                onClick={handleUpdate}
-              >
-                <Pencil size={16} />
-                Update Manufacturer
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-      )}
-      */}
-
       {/* SINGLE DELETE MODAL */}
       {showDeleteModal && selectedManufacturer && (
 
@@ -1746,8 +1492,6 @@ const ManufacturerManagement = () => {
               </strong>
               ?
               <br />
-
-              {/* This action cannot be undone. */}
             </p>
 
             <div className="delete-actions">
@@ -1805,17 +1549,9 @@ const ManufacturerManagement = () => {
 
               <div>
 
-                {/* <span className="details-breadcrumb">
-                  Manufacturer Management / All Manufacturers
-                </span> */}
-
                 <h2>
                   All Manufacturers
                 </h2>
-
-                {/* <p>
-                  Complete list of all manufacturers
-                </p> */}
 
               </div>
 
