@@ -517,10 +517,10 @@ const handleBulkDisapprove = async () => {
         );
       }
 
-      setMessage(
-        data?.message ||
-          "Aircraft upload started in background."
-      );
+      // setMessage(
+      //   data?.message ||
+      //     "Aircraft upload started in background."
+      // );
 
       // Clear selected files
       setFiles([]);
