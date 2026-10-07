@@ -85,7 +85,7 @@ const ManufacturerManagement = () => {
       setError("");
 
       const response = await fetch(
-        `${API_BASE_URL}/manufacturer/manufacturer/`
+        `${API_BASE_URL}/manufacturer/manufacturer-details/`
       );
 
       const data = await response.json();

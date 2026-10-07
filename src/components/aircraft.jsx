@@ -18,7 +18,7 @@ import "../../src/App.css";
 import { API_BASE_URL } from "../../src/constants";
 
 
-const AIRCRAFT_LIST_API = `${API_BASE_URL}/aircraft/aircraft/`;
+const AIRCRAFT_LIST_API = `${API_BASE_URL}/aircraft/aircraft-details/`;
 const AIRCRAFT_DELETE_API = `${API_BASE_URL}/aircraft/delete-aircraft/`;
 const AIRCRAFT_BULK_DELETE_API = `${API_BASE_URL}/aircraft/bulk-delete-aircraft/`;
 const AIRCRAFT_BULK_APPROVE_API =`${API_BASE_URL}/aircraft/bulk-approve-aircraft/`;
@@ -91,7 +91,7 @@ const AircraftManagement = () => {
       setError("");
 
       const response = await fetch(
-        `${API_BASE_URL}/manufacturer/manufacturer/`
+        `${API_BASE_URL}/manufacturer/manufacturer-details/`
       );
 
       const data = await response.json();
@@ -1318,8 +1318,8 @@ const handleBulkDisapprove = async () => {
                                   ? aircraft.images.find(
                                       (image) => image.is_default === true
                                     )?.url ||
-                                    "https://images.unsplash.com/photo-1436491865332-7a61a109cc05"
-                                  : "https://images.unsplash.com/photo-1436491865332-7a61a109cc05"
+                                    "https://d3p4qddo22chul.cloudfront.net/manufacturer/fi_corp.svg"
+                                  : "https://d3p4qddo22chul.cloudfront.net/manufacturer/fi_corp.svg"
                               }
                               alt={
                                 aircraft.Aircraft_Model ||
