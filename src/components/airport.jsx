@@ -61,8 +61,8 @@ const AirportManagement = () => {
 
 
   const [currentPage, setCurrentPage] = useState(1);
-
-  const recordsPerPage = 15;
+  const [totalAirports, setTotalAirports] = useState(0);
+  const recordsPerPage = 20;
 
 
   const selectedAirportRecords = airports.filter((airport) =>
@@ -82,7 +82,7 @@ const AirportManagement = () => {
     );
 
 
-  const fetchAirports = async () => {
+  const fetchAirports = async (page = currentPage) => {
 
     try {
 
@@ -90,30 +90,37 @@ const AirportManagement = () => {
 
       setError("");
 
-      const response = await fetch(AIRPORT_LIST_API, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${AIRPORT_LIST_API}?page=${page}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
+
         throw new Error(
           data?.detail ||
             data?.message ||
             "Failed to fetch airports."
         );
+
       }
 
       const airportData = Array.isArray(data)
         ? data
-        : data?.data ||
-          data?.airports ||
-          [];
+        : data?.results || [];
 
       setAirports(airportData);
 
-      setCurrentPage(1);
+      setTotalAirports(
+        data?.count || airportData.length
+      );
+
+      setSelectedAirportIds([]);
 
     } catch (err) {
 
@@ -132,6 +139,7 @@ const AirportManagement = () => {
       setLoadingAirport(false);
 
     }
+
   };
 
 
@@ -777,7 +785,7 @@ const AirportManagement = () => {
 
 
   const totalPages = Math.ceil(
-    airports.length / recordsPerPage
+  totalAirports / recordsPerPage
   );
 
   const startIndex =
@@ -785,28 +793,34 @@ const AirportManagement = () => {
     recordsPerPage;
 
   const paginatedAirports =
-    airports.slice(
-      startIndex,
-      startIndex + recordsPerPage
-    );
+    airports;
 
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = async () => {
 
-    setCurrentPage((prev) =>
-      Math.max(prev - 1, 1)
-    );
+    const newPage = currentPage - 1;
+
+    if (newPage < 1) {
+      return;
+    }
+
+    setCurrentPage(newPage);
+
+    await fetchAirports(newPage);
 
   };
 
-  const handleNextPage = () => {
+  const handleNextPage = async () => {
 
-    setCurrentPage((prev) =>
-      Math.min(
-        prev + 1,
-        totalPages
-      )
-    );
+    const newPage = currentPage + 1;
+
+    if (newPage > totalPages) {
+      return;
+    }
+
+    setCurrentPage(newPage);
+
+    await fetchAirports(newPage);
 
   };
 
@@ -1166,7 +1180,7 @@ const AirportManagement = () => {
               <span>Total</span>
 
               <strong>
-                {airports.length}
+                {totalAirports}
               </strong>
 
             </div>
