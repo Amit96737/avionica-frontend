@@ -205,105 +205,127 @@ const AirportManagement = () => {
   };
 
 
-  const checkAirportUploadStatus = async (taskId) => {
+const checkAirportUploadStatus = async (taskId) => {
 
-    try {
+  try {
 
-      const response = await fetch(
-        `${API_BASE_URL}/airport/upload-airport-json-status/${taskId}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
+    const response = await fetch(
+      `${API_BASE_URL}/airport/upload-airport-json-status/${taskId}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+
+      throw new Error(
+        data?.detail ||
+          data?.message ||
+          "Failed to check upload status."
       );
 
-      const data = await response.json();
+    }
 
-      if (!response.ok) {
+    if (data.status === "completed") {
 
-        throw new Error(
-          data?.detail ||
-            data?.message ||
-            "Failed to check upload status."
-        );
+      setUploading(false);
+      setUploadTaskId(null);
 
+      const inserted = data?.inserted_count || 0;
+      const updated = data?.updated_count || 0;
+      const invalid = data?.invalid_files || 0;
+      const failed = data?.failed_count || 0;
+
+      let successMessage =
+      `Airport upload completed. ` +
+      `Inserted: ${inserted}, Updated: ${updated}`;
+
+      const alreadyExistsFiles =
+        data?.already_exists_files || [];
+
+      if (alreadyExistsFiles.length > 0) {
+        successMessage +=
+          `, Already Exists: ${alreadyExistsFiles.join(", ")}`;
       }
 
-      if (data.status === "completed") {
-
-        setUploading(false);
-
-        setUploadTaskId(null);
-
-        if (
-          data?.already_exists_files &&
-          data.already_exists_files.length > 0
-        ) {
-
-          setMessage(
-            `${data.already_exists_files.join(
-              ", "
-            )} already exists.`
-          );
-
-        } else {
-
-          setMessage(
-            data?.message ||
-              `Airport upload completed. Inserted: ${
-                data?.inserted_count || 0
-              }`
-          );
-
-        }
-
-        setAirports(data?.inserted_airports || []);
-
-        setCurrentPage(1);
-
-        return;
+      if (invalid > 0) {
+        successMessage += `, Invalid: ${invalid}`;
       }
 
-      if (data.status === "failed") {
+      if (failed > 0) {
+        successMessage += `, Failed: ${failed}`;
+      }
 
-        setUploading(false);
+    setMessage(successMessage);
 
-        setUploadTaskId(null);
+      if (invalid > 0) {
+
+        const invalidMessages =
+          data?.invalid_file_details
+            ?.map(
+              (item) =>
+                `${item.file_name}: ${item.error}`
+            )
+            .join(" | ");
 
         setError(
-          data?.message ||
-            "Airport upload failed."
+          invalidMessages ||
+            `${invalid} file(s) were invalid.`
         );
-
-        return;
 
       }
 
-      setTimeout(() => {
-
-        checkAirportUploadStatus(taskId);
-
-      }, 1000);
-
-    } catch (err) {
-
-      console.error(
-        "Airport Upload Status Error:",
-        err
+      setAirports(
+        data?.inserted_airports || []
       );
+
+      setCurrentPage(1);
+      return;
+    }
+
+    if (data.status === "failed") {
 
       setUploading(false);
 
       setUploadTaskId(null);
 
       setError(
-        err.message ||
-          "Failed to check airport upload status."
+        data?.message ||
+          "Airport upload failed."
       );
+
+      return;
 
     }
 
-  };
+    setTimeout(() => {
+
+      checkAirportUploadStatus(taskId);
+
+    }, 1000);
+
+  } catch (err) {
+
+    console.error(
+      "Airport Upload Status Error:",
+      err
+    );
+
+    setUploading(false);
+
+    setUploadTaskId(null);
+
+    setError(
+      err.message ||
+        "Failed to check airport upload status."
+    );
+
+  }
+
+};
 
 
   const handleUpload = async () => {
@@ -370,11 +392,30 @@ const AirportManagement = () => {
 
       const taskId = data?.task_id;
 
+      if (data?.invalid_files > 0) {
+
+        const invalidMessages =
+          data?.invalid_file_details
+            ?.map(
+              (item) =>
+                `${item.file_name}: ${item.error}`
+            )
+            .join(" | ");
+
+        setError(
+          invalidMessages ||
+            `${data.invalid_files} file(s) are invalid.`
+        );
+
+      }
+
       if (!taskId) {
 
-        throw new Error(
-          "Upload task ID was not received."
-        );
+        setUploading(false);
+
+        setUploadTaskId(null);
+
+        return;
 
       }
 
@@ -392,10 +433,24 @@ const AirportManagement = () => {
 
       }
 
-      setMessage(
-        data?.message ||
-          "Airport upload started in background."
-      );
+      if (data?.invalid_files > 0) {
+        const invalidMessages = data.invalid_file_details
+          .map(
+            (item) =>
+              `${item.file_name}: ${item.error}`
+          )
+          .join(" | ");
+
+        setError(
+          `${data.invalid_files} file(s) invalid. ${invalidMessages}`
+        );
+      }
+
+      if (data?.valid_files > 0) {
+        setMessage(
+          `${data.valid_files} valid file(s) are being processed.`
+        );
+      }
 
       checkAirportUploadStatus(taskId);
 
